@@ -1,0 +1,1 @@
+{"login_image":"images\/bg.jpg","logo":"","create_password_image":"","profile_tab_image":"","instructions_about_scorecard_image":"","index_image":""}

@@ -1,0 +1,8 @@
+{
+    "require": {
+        "phpoffice/phpspreadsheet": "^2.2",
+        "twilio/sdk": "^8.2",
+        "phpmailer/phpmailer": "^6.9",
+        "nexmo/client": "^2.4"
+    }
+}

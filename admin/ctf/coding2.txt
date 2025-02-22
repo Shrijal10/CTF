@@ -1,0 +1,917 @@
+<?php include("login.php");
+session_start();
+error_reporting(0);
+$userprofile = $_SESSION["user_name"];
+if ($userprofile == true)       
+{
+    
+}
+//else    
+//
+//    header('Location: loginh.php'); 
+//}
+//
+?>
+              <?php
+              session_start();
+        
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Handle form submission for challenge 1
+    if (isset($_POST['submit_challenge1'])) {
+        // Your code to handle submission for challenge 1...
+
+        // Set a cookie to mark challenge 1 as solved
+        setcookie('challenge1_solved', 'true', time() + (86400 * 30), "/"); // Cookie set to expire in 30 days
+        header("Location: ".$_SERVER['PHP_SELF']);
+        exit();
+    }
+}
+              function getpoints($conn,$pointsToAdd, $challengeId){
+                
+            $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+            $resultCount = mysqli_query($conn, $queryCount);
+            if ($resultCount) {
+                $row = mysqli_fetch_assoc($resultCount);
+                $numTeamsSolved = $row['num_teams'];
+                
+                // Calculate the number of times to deduct points (every group of 5 teams)
+                $numDeductions = floor($numTeamsSolved / 5);
+                
+                // Deduct points for each group of 5 teams
+                for ($i = 0; $i < $numDeductions; $i++) {
+                    $pointsToAdd -= 10;
+                }
+                
+                echo "$pointsToAdd points";
+            }
+              }
+              function updateScoreboard($conn, $teamName, $pointsToAdd) {
+                // Check if the team exists in the scoreboard
+                $checkQuery = "SELECT * FROM scoreboard WHERE team_name = '$teamName'";
+                $checkResult = mysqli_query($conn, $checkQuery);
+            
+                if (!$checkResult) {
+                    echo "Error checking scoreboard: " . mysqli_error($conn);
+                    exit();
+                }
+            
+                if (mysqli_num_rows($checkResult) > 0) {
+                    // Team exists, update their score
+                    $updateQuery = "UPDATE scoreboard 
+                                    SET Challenges_Solved = Challenges_Solved + 1, 
+                                        Score = Score + $pointsToAdd 
+                                    WHERE team_name = '$teamName'";
+                    $updateResult = mysqli_query($conn, $updateQuery);
+            
+                    if (!$updateResult) {
+                        echo "Error updating scoreboard: " . mysqli_error($conn);
+                        exit();
+                    }
+            
+                    echo "Challenge is Solved!";
+                    echo "<script>
+            document.getElementById('flag').disabled = true;
+            document.getElementById('submit').disabled = true;
+          </script>";
+                  //echo "<script> setTimeout(function(){location.reload()}, 0);</script>";
+                } else {
+                    // Team does not exist, insert a new entry
+                    $insertQuery = "INSERT INTO scoreboard (team_name, Challenges_Solved, Score) 
+                                    VALUES ('$teamName', 1, $pointsToAdd)";
+                    $insertResult = mysqli_query($conn, $insertQuery);
+            
+                    if (!$insertResult) {
+                        echo "Error inserting into scoreboard: " . mysqli_error($conn);
+                        exit();
+                    }
+            
+                    echo "Challenge is Solved!";
+                    echo "<script> setTimeout(function(){location.reload()}, 0);</script>";
+                }
+            }
+              function getchallengeColor($challengeId){
+                if(isset(($_SESSION['flag_correct'])[$challengeId])&& $_SESSION['flag_correct'][$challengeId]=== true){
+                    return 'solved';
+                } else{
+                    return '';
+                }
+              }
+              if (!isset ($_SESSION['flag_correct'])){
+                $_SESSION['flag_correct']=[];
+            
+            }
+            
+                function handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId) {
+    $query = "SELECT * FROM challenges WHERE flag = '$flag' AND challenge_id = $challengeId";
+    $result = mysqli_query($conn, $query);
+    $checkSolvedQuery = "SELECT * FROM scoreboard WHERE team_name = '$teamName'";
+$checkSolvedResult = mysqli_query($conn, $checkSolvedQuery);
+$totalChallenges = 2;
+
+if ($checkSolvedResult) {
+    $row = mysqli_fetch_assoc($checkSolvedResult);
+    // Loop through each challenge to check if it's solved
+    for ($i = 1; $i <= $totalChallenges; $i++) {
+        $challengeSolved = $row['solved_challenge_' . $i];
+        // If the challenge is already solved, disable flag input and submit button for that challenge
+        if ($challengeSolved) {
+            echo "<script>
+                    document.getElementById('flag').disabled = true; // Disable flag input for challenge 
+                    document.getElementById('submit').disabled = true; // Disable submit button for challenge
+                  </script>";
+        }
+    }
+}
+
+
+    if (!$result) {
+        echo "Error: " . mysqli_error($conn);
+        exit();
+    }
+
+    if (mysqli_num_rows($result) > 0) {
+        updateScoreboard($conn, $teamName,$pointsToAdd);
+        $_SESSION[_("flag_correct")][$challengeId] = true;
+        echo "<script>
+        document.getElementById('flag').disabled = true;
+        document.getElementById('submit').disabled = true;
+  </script>";
+       
+    } else {
+        echo "Incorrect flag!";
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag'])  && isset($_POST['challenge_id']) && $_POST['challenge_id']==1) {
+    $pointsToAdd = 80;
+    $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+    $resultCount = mysqli_query($conn, $queryCount);
+    if ($resultCount) {
+        $row = mysqli_fetch_assoc($resultCount);
+        $numTeamsSolved = $row['num_teams'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    $challengeId = mysqli_real_escape_string($conn, $_POST['challenge_id']);
+
+    //handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag'])  && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 2) {
+    
+    $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+    $resultCount = mysqli_query($conn, $queryCount);
+    if ($resultCount) {
+        $row = mysqli_fetch_assoc($resultCount);
+        $numTeamsSolved = $row['num_teams'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    $challengeId = mysqli_real_escape_string($conn, $_POST['challenge_id']);
+
+    //handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag'])  && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 3) {
+    
+    $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+    $resultCount = mysqli_query($conn, $queryCount);
+    if ($resultCount) {
+        $row = mysqli_fetch_assoc($resultCount);
+        $numTeamsSolved = $row['num_teams'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    $challengeId = mysqli_real_escape_string($conn, $_POST['challenge_id']);
+
+    //handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag'])  && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 4) {
+    $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+    $resultCount = mysqli_query($conn, $queryCount);
+    if ($resultCount) {
+        $row = mysqli_fetch_assoc($resultCount);
+        $numTeamsSolved = $row['num_teams'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    $challengeId = mysqli_real_escape_string($conn, $_POST['challenge_id']);
+
+    //handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag'])  && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 5) {
+    $pointsToAdd = 100;
+    $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+    $resultCount = mysqli_query($conn, $queryCount);
+    if ($resultCount) {
+        $row = mysqli_fetch_assoc($resultCount);
+        $numTeamsSolved = $row['num_teams'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    $challengeId = mysqli_real_escape_string($conn, $_POST['challenge_id']);
+
+    //handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag'])  && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 6) {
+    $pointsToAdd = 100;
+    $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+    $resultCount = mysqli_query($conn, $queryCount);
+    if ($resultCount) {
+        $row = mysqli_fetch_assoc($resultCount);
+        $numTeamsSolved = $row['num_teams'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    $challengeId = mysqli_real_escape_string($conn, $_POST['challenge_id']);
+
+    //handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+    <title>TALAKUNCHI CTF</title>
+
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="css/bootstrap4-neon-glow.min.css">
+
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel='stylesheet' href='//cdn.jsdelivr.net/font-hack/2.020/css/hack.min.css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> -->
+    <style>
+        .card-header.solved {
+    background-color: green; /* Green color */
+    color: white; /* White text color */
+}
+        .demo {
+            font-size: 30px; /* Adjust the font size as needed */
+            padding-left: 1000px; /* Add some padding to the right for spacing */
+            right:   50px; /* Position the clock in the top right corner of the window */
+            color:red;
+            font-family: 'Hack;apple-system;BlinkMacSystemFont;Segoe UI;Roboto;Helvetica Neue;Arial;sans-serif;Apple Color Emoji;Segoe UI Emoji;Segoe UI Symbol';
+        }
+    </style>
+
+</head>
+
+<body>    
+    <div class="navbar-dark text-white">
+        <div class="container">
+            <nav class="navbar px-0 py-0 navbar-expand-lg navbar-dark">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav">
+                            <h3 class="bold"><span class="color_danger">TALAKUNCHI</span><span class="color_white">CTF</span></h3>
+                    </div>
+                    <div class="navbar-nav ml-auto">
+                        <a href="about.php" class="p-3 text-decoration-none text-light bold">About</a>
+                        <a href="Scoreboard.php" class="p-3 text-decoration-none text-light bold">Scoreboard</a>
+                        <a href="quests.php" class="p-3 text-decoration-none text-white bold">Challenges</a>
+                        <a href="logout.php" onclick="return confirmLogout()" class="p-3 text-decoration-none text-light bold">Log Out</a>
+                    </div>
+                </div>
+            </nav>
+
+        </div>
+    </div>
+    <p id="demo" class="demo"></p>
+
+    <div class="jumbotron bg-transparent mb-0 pt-0 radius-0">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12  text-center">
+                    <h1 class="display-1 bold color_white content__title">QUESTS<span class="vim-caret">&nbsp;</span></h1>
+                    <p class="text-grey text-spacey hackerFont lead mb-5">
+                        Its time to show the world what you can do!
+                    </p>
+                </div>
+            </div>
+            <div class="row hackerFont">
+                <div class="col-md-12">
+                    <h4>Challenges</h4>
+                </div>
+                <div class="col-md-4 mb-3">
+    <div class="card category_web">
+    <div class="card-header <?php echo getchallengeColor(1);?>" id="challenge_id1" data-challenge-id="1" data-target="#problem_id_1" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_1">
+            Bombs Landed  <span class="badge align-self-end"><?php echo getpoints($conn,80,1); ?></span>
+        </div>
+        <div id="problem_id_1" class="collapse card-body">
+            <blockquote class="card-blockquote">
+                <div style="display: flex;">
+                <h6 class="solvers challenge_<?php echo $challengeId1; ?>">Solvers: <span class="solver_num"><?php $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                            echo "<p>$numTeamsSolved</p>";
+                        }?></span> &nbsp;<span class="color_danger challenge_<?php echo $challengeId1; ?>">Difficulty:</span></h6>                   
+                </div>
+                <div class="pl-2"><canvas style="width:80px;height:20px" id="problem_id_1_chart"></canvas></div>
+                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{text}
+                </p>
+                <a target="_blank" href="#!" class="btn btn-outline-secondary btn-shadow"><span class="fa fa-download mr-2"></span>Download</a>
+                <form action="" method="POST" autocomplete="off">
+                    <div class="input-group mt-3">
+                        <input type="text" id="flag"  class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag">
+                        <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="1">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo isset($_COOKIE['challenge1_solved'])? 'disabled' : '';?> ></button>
+                        </div>
+                    </div>
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 1) {
+    $pointsToAdd = 80;
+    $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+    $resultCount = mysqli_query($conn, $queryCount);
+    if ($resultCount) {
+        $row = mysqli_fetch_assoc($resultCount);
+        $numTeamsSolved = $row['num_teams'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    
+    handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+?>
+                </form>          
+                         </blockquote>
+                    </div>
+                </div>
+            </div>
+                <div class="col-md-4 mb-3">
+    <div class="card category_reversing">
+        <div class="card-header <?php echo getchallengeColor(2);?>" id="challenge_id2" data-challenge-id="2" data-target="#problem_id_2" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_2">
+            Find The Easy Pass <span class="badge align-self-end"><?php echo getpoints($conn,100,2); ?></span>
+        </div>
+        <div id="problem_id_2" class="collapse card-body">
+            <blockquote class="card-blockquote">
+                <div style="display: flex;">
+                <h6 class="solvers challenge_<?php echo $challengeId2; ?>">Solvers: <span class="solver_num"><?php $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                            echo "<p>$numTeamsSolved</p>";
+                        }?></span> &nbsp;<span class="color_danger challenge_<?php echo $challengeId2; ?>">Difficulty:</span></h6>
+                    <div class="pl-2"><canvas style="width:80px;height:20px" id="problem_id_2_chart"></canvas></div>
+                </div>
+                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{passwordhere}
+                </p>
+                <a target="_blank" href="#!" class="btn btn-outline-secondary btn-shadow"><span class="fa fa-download mr-2"></span>Download</a>
+                <form action="" method="POST" autocomplete="off">
+                    <div class="input-group mt-3">
+                        <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag">
+                        <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="2">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" ></button>
+                        </div>
+                    </div>
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 2) {
+                        $pointsToAdd = 100;
+                        $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 10;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                </form>
+            </blockquote>
+        </div>
+    </div>
+</div>              
+                 <div class="col-md-4 mb-3">
+                    <div class="card category_pwning">
+                        <div class="card-header <?php echo getchallengeColor(3);?>" id="challenge_id3" data-target="#problem_id_3" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_3">
+                            Impossible Password <span class="badge align-self-end"><?php echo getpoints($conn,150,3); ?></span>
+                        </div>
+                        <div id="problem_id_3" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId3; ?>">Solvers: <span class="solver_num"><?php $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                            echo "<p>$numTeamsSolved</p>";
+                        }?></span> &nbsp;<span class="color_danger challenge_<?php echo $challengeId3; ?>">Difficulty:</span></h6>
+                                    <div class="pl-2"><canvas style="width:80px;height:20px" id="problem_id_3_chart"></canvas></div>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{passwordhere}
+                                </p>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary btn-shadow"><span class="fa fa-download mr-2"></span>Download</a>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                    <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag">
+                                    <div class="input-group-append">
+                                    <input type="hidden" name="challenge_id" value="3">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" ></button>
+                                    </div>
+                                </div>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 3) {
+                        $pointsToAdd = 100;
+                        $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 20;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                    </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card category_misc">
+                        <div class="card-header <?php echo getchallengeColor(4);?>" id="challenge_id4" data-target="#problem_id_4" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_4">
+                            Find The Secret Flag <span class="badge align-self-end"><?php echo getpoints($conn,200,4); ?></span>
+                        </div>
+                        <div id="problem_id_4" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId4; ?>">Solvers: <span class="solver_num"><?php $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                            echo "<p>$numTeamsSolved</p>";
+                        }?></span> &nbsp;<span class="color_danger challenge_<?php echo $challengeId4; ?>">Difficulty:</span></h6>
+                                    <div class="pl-2"><canvas style="width:80px;height:20px" id="problem_id_4_chart"></canvas></div>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{passwordhere}
+                                </p>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary btn-shadow"><span class="fa fa-download mr-2"></span>Download</a>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                    <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag">
+                                    <div class="input-group-append">
+                                    <input type="hidden" name="challenge_id" value="4">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" ></button>
+                                    </div>
+                                </div>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 4) {
+                        $pointsToAdd = 100;
+                        $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 25;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                                </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card category_steg">
+                        <div class="card-header <?php echo getchallengeColor(5);?>" id="challenge_id5" data-target="#problem_id_5" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_5">
+                            DSYM <span class="badge align-self-end"><?php echo getpoints($conn,250,5); ?></span>
+                        </div>
+                        <div id="problem_id_5" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId5; ?>">Solvers: <span class="solver_num"><?php $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                            echo "<p>$numTeamsSolved</p>";
+                        }?></span> &nbsp;<span class="color_danger challenge_<?php echo $challengeId4; ?>">Difficulty:</span></h6>
+                                    <div class="pl-2"><canvas style="width:80px;height:20px" id="problem_id_5_chart"></canvas></div>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{passwordhere}
+                                </p>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary btn-shadow"><span class="fa fa-download mr-2"></span>Download</a>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                    <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag">
+                                    <div class="input-group-append">
+                                    <input type="hidden" name="challenge_id" value="5">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" ></button>
+                                    </div>
+                                </div>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 5) {
+                        $pointsToAdd = 100;
+                        $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 30;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                                </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="card category_crypt">
+                        <div class="card-header <?php echo getchallengeColor(6);?>" id="challenge_id6" data-target="#problem_id_6" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_6">
+                            Headache <span class="badge align-self-end"><?php echo getpoints($conn,200,6); ?></span>
+                        </div>
+                        <div id="problem_id_6" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId6; ?>">Solvers: <span class="solver_num"><?php $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                            echo "<p>$numTeamsSolved</p>";
+                        }?></span> &nbsp;<span class="color_danger challenge_<?php echo $challengeId6; ?>">Difficulty:</span></h6>
+                                    <div class="pl-2"><canvas style="width:80px;height:20px" id="problem_id_6_chart"></canvas></div>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{passwordhere}
+                                </p>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary btn-shadow"><span class="fa fa-download mr-2"></span>Download</a>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                    <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag">
+                                    <div class="input-group-append">
+                                    <input type="hidden" name="challenge_id" value="6">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" ></button>
+                                    </div>
+                                </div>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 6) {
+                        $pointsToAdd = 100;
+                        $queryCount = "SELECT COUNT(DISTINCT team_name) AS num_teams FROM scoreboard WHERE Challenges_Solved > 0";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 30;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                                </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row hackerFont justify-content-center mt-5">
+                <div class="col-md-12">
+                    <h4>Machines</h4>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="card category_machine">
+                        <a href="machine.html" class="color_white">
+                            <div class="card-header">
+                                Headache <span class=" ml-4 badge align-self-end">1000 points</span>
+                                <div class="pl-4 machine" style="display: inline-flex;">
+                                    10.10.15.117
+                                    <h6 class=" pl-4 pt-1 solvers">Solvers: <span class="solver_num">76</span> &nbsp;<span class="color_danger">Difficulty:</span></h6>
+                                    <div class="pl-2"><canvas style="width:80px;height:20px" id="problem_id_7_chart"></canvas></div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-md-12 mb-3">
+                    <div class="card category_machine">
+                        <a href="machine.html" class="color_white">
+                            <div class="card-header">
+                                CORONA <span class=" ml-4 badge align-self-end">1000 points</span>
+                                <div class="pl-4 machine" style="display: inline-flex;">
+                                    10.10.15.112
+                                    <h6 class=" pl-4 pt-1 solvers">Solvers: <span class="solver_num">76</span> &nbsp;<span class="color_danger">Difficulty:</span></h6>
+                                    <div class="pl-2"><canvas style="width:80px;height:20px" id="problem_id_8_chart"></canvas></div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row hackerFont justify-content-center mt-5">
+                <div class="col-md-12">
+                    <br><br>Challenge Types:
+                    <span class="p-1" style="background-color:#ef121b94">Web</span>
+                    <span class="p-1" style="background-color:#17b06b94">Reversing</span>
+                    <span class="p-1" style="background-color:#f9751594">Steganography</span>
+                    <span class="p-1" style="background-color:#36a2eb94">Pwning</span>
+                    <span class="p-1" style="background-color:#9966FF94">Cryptography</span>
+                    <span class="p-1" style="background-color:#ffce5694">Other</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="hint" tabindex="-1" role="dialog" aria-labelledby="hint label" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        HINT GOES HERE
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+function submitChallenge(challengeId) {
+    // Get the flag value entered by the user
+    var flagValue = document.querySelector('#' + challengeId).value;
+    
+    // Set the value of the hidden input field in the form
+    document.querySelector('#' + challengeId + '_flag').value = flagValue;
+    
+    // Submit the form
+    document.getElementById('challengeForm').submit();
+}
+</script>
+        <script>
+            var dataset = [
+                [41, 42, 43, 44, 45, 0], // keep the zero here
+                [10, 9, 8, 7, 6, 0],
+                [21, 16, 23, 1, 15, 0],
+                [71, 12, 13, 17, 25, 0],
+                [31, 5, 23, 24, 10, 0],
+                [11, 2, 13, 41, 15, 0],
+                [31, 5, 23, 24, 10, 0],
+                [11, 2, 13, 41, 15, 0],
+            ]
+
+            function getBarChartData(i) {
+                return barChartData = {
+                    labels: ['Easy1', 'Easy2', 'Medium3', 'Hard4', 'Hard5'],
+                    datasets: [{
+                        label: 'Dataset 1',
+                        backgroundColor: [
+                            '#17b06b', '#17b06b', '#ffce56', '#ef121b', '#ef121b'
+                        ],
+                        borderColor: [
+                            '#17b06b', '#17b06b', '#ffce56', '#ef121b', '#ef121b'
+                        ],
+                        borderWidth: 1,
+                        data: dataset[i - 1]
+                    }]
+
+                };
+            }
+
+            window.onload = function() {
+                var numcharts = 8;
+                for (let i = 1; i <= numcharts; i++) {
+                    var ctx = document.getElementById('problem_id_' + i + '_chart').getContext('2d');
+                    window.myBar = new Chart(ctx, {
+                        type: 'bar',
+                        data: getBarChartData(i),
+                        options: {
+                            tooltips: {
+                                enabled: false,
+                            },
+                            responsive: false,
+                            legend: {
+                                display: false,
+                            },
+                            scales: {
+                                yAxes: [{
+                                    display: false
+                                }],
+                                xAxes: [{
+                                    display: false
+                                }]
+                            }
+                        }
+                    });
+                    myBar.canvas.parentNode.style.width = '80px';
+                    myBar.canvas.parentNode.style.height = '20px';
+                }
+            };
+        </script>
+         <script>
+        function confirmLogout() {
+            // Display confirmation dialog
+            var confirmLogout = confirm("Are you sure you want to log out?");
+            
+            // If user confirms, redirect to logout.php
+            if(confirmLogout) {
+                window.location.href = "logout.php";
+                return true;
+            } else {
+                return false;
+            }
+        }
+    </script>
+       <script>
+// Set the current date
+var currentDate = new Date();
+
+// Set the countdown time for today's date at 16:00:00
+currentDate.setHours(22, 0, 0, 0);
+var countDownDate = currentDate.getTime();
+
+// Function to update the countdown
+function updateCountdown() {
+  // Get the current time
+  var now = new Date().getTime();
+
+  // Find the distance between now and the countdown time
+  var distance = countDownDate - now;
+
+  // Time calculations for hours, minutes, and seconds
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  // Display the result in the element with id="demo"
+  document.getElementById("demo").innerHTML = hours + "H "
+  + minutes + "M " + seconds + "S ";
+
+  // If the countdown is finished, redirect to 'closed.html'
+  if (distance <= 0) {
+    window.location.href = 'closed.html';
+  } else {
+    // Call the function recursively after 1 second
+    setTimeout(updateCountdown, 1000);
+  }
+}
+
+// Initial call to start the countdown
+updateCountdown();
+</script>
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script>
+    function message()
+    {
+        alert('Message sent!');
+    }
+</body>
+
+</html>

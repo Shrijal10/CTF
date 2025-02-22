@@ -1,0 +1,1208 @@
+<div class="col-md-4 mb-3">
+    <div class="card category_web">
+        <div class="card-header <?php echo getchallengeColor($conn, 1, $userprofile);?>" id="challenge_id1" data-challenge-id="1" data-target="#problem_id_1" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_1">
+            Bombs Landed <br> <span class="badge align-self-end"><?php echo getpoints($conn, 100, 1, 'Easy'); ?></span>
+        </div>
+        <div id="problem_id_1" class="collapse card-body">
+            <blockquote class="card-blockquote">
+                <div style="display: flex;">
+                    <h6 class="solvers challenge_<?php echo $challengeId1; ?>">Solvers: <span class="solver_num"><?php solvers($conn, 1, $flag,$teamName); ?></span><br><span class="color_blue challenge_<?php echo $challengeId1; ?>">Difficulty:<?php echo getDifficulty($conn, 1); ?></span></h6>
+                </div>
+                <p>Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{text}<span id="dots">...</span><span id="more" style="display: none;">erisque enim ligula venenatis dolor. Maecenas nisl est, ultrices nec congue eget, auctor vitae massa. Fusce luctus vestibulum augue ut aliquet. Nunc sagittis dictum nisi, sed ullamcorper ipsum dignissim ac. In at libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor porta.</span>
+                <button onclick="openPopup()" id="myBtn" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+            </p>
+<div id="popup" class="popup">
+    <span id="popupContent"></span>
+    <button onclick="closePopup()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+<script>
+    function openPopup() {
+        var moreText = document.getElementById("more");
+        var popup = document.getElementById("popup");
+        var popupContent = document.getElementById("popupContent");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+
+    function closePopup() {
+        var popup = document.getElementById("popup");
+        popup.style.display = "none";
+    }
+</script>
+                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-2"></span>Download</a>
+                <form action="" method="POST" autocomplete="off">
+                    <div class="input-group mt-3">
+                        <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')" <?php echo (isset($_COOKIE['challenge1_solved']) || strpos(getchallengeColor($conn, 1, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="1">
+                            <input type="submit" class="btn btn-outline-secondary" value="Go!" name="login" id="submit"<?php echo (isset($_COOKIE['challenge1_solved']) || strpos(getchallengeColor($conn, 1, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        </div>
+                    </div>
+                    <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 1) {
+            $pointsToAdd = 100;
+            $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+            $resultCount = mysqli_query($conn, $queryCount);
+            if ($resultCount) {
+            $row = mysqli_fetch_assoc($resultCount);
+            $numTeamsSolved = $row['num_teams_solved'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    
+    handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+?>
+                </form>          
+                         </blockquote>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+    <div class="card category_misc">
+        <div class="card-header <?php echo getchallengeColor($conn, 2, $userprofile);?>" id="challenge_id2" data-challenge-id="2" data-target="#problem_id_2" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_2">
+            Find The Easy Pass <span class="badge align-self-end"><?php echo getpoints($conn,150,2,'Medium'); ?></span>
+        </div>
+        <div id="problem_id_2" class="collapse card-body">
+            <blockquote class="card-blockquote">
+                <div style="display: flex;">
+                <h6 class="solvers challenge_<?php echo $challengeId2; ?>">Solvers: <span class="solver_num" id="solvers">
+                <?php
+                solvers($conn, 2, $flag,$teamName); 
+    ?>
+</span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId2; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 2); ?></span></h6>
+                </div>
+                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{passwordhere}
+                <span id="dots">...</span><span id="more1" style="display: none;">ultrices nec congue eget, auctor vitae massa. Fusce luctus vestibulum augue ut aliquet. Nunc sagittis dictum nisi, sed ullamcorper ipsum dignissim ac. In at libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor porta.</span>
+                <button onclick="openPopup1()" id="myBtn1" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button></p>
+            </p>
+<div id="popup1" class="popup">
+    <span id="popupContent1"></span>
+    <button onclick="closePopup1()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup1() {
+        var moreText = document.getElementById("more1");
+        var popup = document.getElementById("popup1");
+        var popupContent = document.getElementById("popupContent1");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup1() {
+        var popup = document.getElementById("popup1");
+        popup.style.display = "none";
+    }
+</script>
+<a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-2"></span>Download</a>
+                <form action="" method="POST" autocomplete="off">
+                <div class="input-group mt-3">
+                <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')" <?php echo (isset($_COOKIE['challenge2_solved']) || strpos(getchallengeColor($conn, 2, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="2">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge2_solved']) || strpos(getchallengeColor($conn,2, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                        </div>
+                    </div>
+                    <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 2) {
+                        $pointsToAdd = 150;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 10;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']);
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                </form>
+            </blockquote>
+        </div>
+    </div>
+</div>              
+                 <div class="col-md-4 mb-3">
+                    <div class="card category_network">
+                        <div class="card-header <?php echo getchallengeColor($conn, 3, $userprofile);?>" id="challenge_id3" data-target="#problem_id_3" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_3">
+                            Impossible Password <span class="badge align-self-end"><?php echo getpoints($conn,200,3,'Hard'); ?></span>
+                        </div>
+                        <div id="problem_id_3" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId3; ?>">Solvers: <span class="solver_num"><?php solvers($conn, 3, $flag,$teamName); ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId3; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 3); ?></span></h6>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{passwordhere <span id="dots">...</span><span id="more2" style="display: none;">Fusce luctus vestibulum augue ut aliquet. Nunc sagittis dictum nisi, sed ullamcorper ipsum dignissim ac. In at libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor porta.</span>
+                <button onclick="openPopup2()" id="myBtn2" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button></p>
+            </p>
+<div id="popup2" class="popup">
+    <span id="popupContent2"></span>
+    <button onclick="closePopup2()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup2() {
+        var moreText = document.getElementById("more2");
+        var popup = document.getElementById("popup2");
+        var popupContent = document.getElementById("popupContent2");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup2() {
+        var popup = document.getElementById("popup2");
+        popup.style.display = "none";
+    }
+</script>
+                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-2"></span>Download</a>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')" <?php echo (isset($_COOKIE['challenge3_solved']) || strpos(getchallengeColor($conn, 3, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                                <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="3">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge3_solved']) || strpos(getchallengeColor($conn, 3, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                                </div>
+                                </div>
+                                <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 3) {
+                        $pointsToAdd = 200;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -=15;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                    </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card category_misc">
+                        <div class="card-header <?php echo getchallengeColor($conn, 4, $userprofile);?>" id="challenge_id4" data-target="#problem_id_4" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_4">
+                            Find The Secret Flag <span class="badge align-self-end"><?php echo getpoints($conn,100,4,'Easy'); ?></span>
+                        </div>
+                        <div id="problem_id_4" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId4; ?>">Solvers: <span class="solver_num"><?php
+                solvers($conn, 4, $flag,$teamName); 
+    ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId4; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 4); ?></span></h6>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{password}
+                                <span id="dots">...</span><span id="more3" style="display: none;">sed ullamcorper ipsum dignissim ac. In at libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor porta.</span>
+                <button onclick="openPopup3()" id="myBtn3" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button></p>
+            </p>
+<div id="popup3" class="popup">
+    <span id="popupContent3"></span>
+    <button onclick="closePopup3()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup3() {
+        var moreText = document.getElementById("more3");
+        var popup = document.getElementById("popup3");
+        var popupContent = document.getElementById("popupContent3");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup3() {
+        var popup = document.getElementById("popup3");
+        popup.style.display = "none";
+    }
+</script>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-4"></span>Download</a>
+                                </p>
+                                <script type="text/javascript">
+                    document.getElementById("readmore2").onclick = function() {
+                        var popup = window.open('','popUpWindow', 'height=500,width=500,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no,status=yes');
+                        popup.document.write("<p>This password is the password of the admin of the Talakunchi CTF server.<br>Please use this password with caution2.</p>");
+                        popup.document.close();
+                    };
+                </script>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')" <?php echo (isset($_COOKIE['challenge4_solved']) || strpos(getchallengeColor($conn, 4, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                                <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="4">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge4_solved']) || strpos(getchallengeColor($conn, 4, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                                </div>
+                                </div>
+                                <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 4) {
+                        $pointsToAdd = 100;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 5;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                                </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card category_steg">
+                        <div class="card-header <?php echo getchallengeColor($conn, 5, $userprofile);?>" id="challenge_id5" data-target="#problem_id_5" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_5">
+                            DSYM <br><span class="badge align-self-end"><?php echo getpoints($conn,150,5,'Medium'); ?></span>
+                        </div>
+                        <div id="problem_id_5" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId5; ?>">Solvers: <span class="solver_num"><?php
+                solvers($conn, 5, $flag, $teamName); 
+    ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId4; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 5); ?></span></h6>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF
+                                <span id="dots">...</span><span id="more4" style="display: none;">In at libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor porta.</span>
+                <button onclick="openPopup4()" id="myBtn4" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup4" class="popup">
+    <span id="popupContent4"></span>
+    <button onclick="closePopup4()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup4() {
+        var moreText = document.getElementById("more4");
+        var popup = document.getElementById("popup4");
+        var popupContent = document.getElementById("popupContent4");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup4() {
+        var popup = document.getElementById("popup4");
+        popup.style.display = "none";
+    }
+</script>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-4"></span>Download</a>
+                                </p>
+                                <script type="text/javascript">
+                    document.getElementById("readmore3").onclick = function() {
+                        var popup = window.open('','popUpWindow', 'height=500,width=500,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no,status=yes');
+                        popup.document.write("<p>This password is the password of the admin of the Talakunchi CTF server.<br>Please use this password with caution3.</p>");
+                        popup.document.close();
+                    };
+                </script>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')" <?php echo (isset($_COOKIE['challenge5_solved']) || strpos(getchallengeColor($conn, 5, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                                <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="5">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge5_solved']) || strpos(getchallengeColor($conn, 5, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                                </div>
+                                <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 5) {
+                        $pointsToAdd = 150;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 10;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                                </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card category_crypt">
+                        <div class="card-header <?php echo getchallengeColor($conn,6, $userprofile);?>" id="challenge_id6" data-target="#problem_id_6" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_6">
+                            Headache<br> <span class="badge align-self-end"><?php echo getpoints($conn,200,6,'Hard'); ?></span>
+                        </div>
+                        <div id="problem_id_6" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId6; ?>">Solvers: <span class="solver_num"><?php
+                solvers($conn, 6, $flag,$teamName); 
+    ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId6; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 6); ?></span></h6>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHICTF<span id="dots">...</span><span id="more5" style="display: none;">In at libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup5()" id="myBtn5" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup5" class="popup">
+    <span id="popupContent5"></span>
+    <button onclick="closePopup5()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup5() {
+        var moreText = document.getElementById("more5");
+        var popup = document.getElementById("popup5");
+        var popupContent = document.getElementById("popupContent5");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup5() {
+        var popup = document.getElementById("popup5");
+        popup.style.display = "none";
+    }
+</script>
+<a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-4"></span>Download</a>    
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')" <?php echo (isset($_COOKIE['challenge6_solved']) || strpos(getchallengeColor($conn, 6, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                                <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="6">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge6_solved']) || strpos(getchallengeColor($conn, 6, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                                </div>
+                                </div>
+                                <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 6) {
+                        $pointsToAdd = 200;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 15;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                                </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            <div class="col-md-4 mb-3">
+    <div class="card category_web">
+        <div class="card-header <?php echo getchallengeColor($conn, 7, $userprofile);?>" id="challenge_id7" data-challenge-id="7" data-target="#problem_id_7" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_7">
+            Bombs <br><span class="badge align-self-end"><?php echo getpoints($conn, 100, 7, 'Easy'); ?></span>
+        </div>
+        <div id="problem_id_7" class="collapse card-body">
+            <blockquote class="card-blockquote">
+                <div style="display: flex;">
+                    <h6 class="solvers challenge_<?php echo $challengeId7; ?>">Solvers: <span class="solver_num"><?php solvers($conn, 7, $flag,$teamName); ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId7; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 7); ?></span></h6>
+                </div>
+                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI<span id="dots">...</span><span id="more6" style="display: none;"> at libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup6()" id="myBtn6" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup6" class="popup">
+    <span id="popupContent6"></span>
+    <button onclick="closePopup6()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup6() {
+        var moreText = document.getElementById("more6");
+        var popup = document.getElementById("popup6");
+        var popupContent = document.getElementById("popupContent6");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup6() {
+        var popup = document.getElementById("popup6");
+        popup.style.display = "none";
+    }
+</script>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-4"></span>Download</a>
+                                </p>
+                <form action="" method="POST" autocomplete="off">
+                    <div class="input-group mt-3">
+                    <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')" <?php echo (isset($_COOKIE['challenge7_solved']) || strpos(getchallengeColor($conn, 7, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="7">
+                            <input type="submit" class="btn btn-outline-secondary" value="Go!" name="login" id="submit"<?php echo (isset($_COOKIE['challenge1_solved']) || strpos(getchallengeColor($conn, 7, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        </div>
+                    </div>
+                    <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 7) {
+            $pointsToAdd = 100;
+            $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+            $resultCount = mysqli_query($conn, $queryCount);
+            if ($resultCount) {
+            $row = mysqli_fetch_assoc($resultCount);
+            $numTeamsSolved = $row['num_teams_solved'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    
+    handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+?>
+                </form>          
+                         </blockquote>
+                    </div>
+                </div>
+            </div>
+                <div class="col-md-4 mb-3">
+    <div class="card category_reversing">
+        <div class="card-header <?php echo getchallengeColor($conn, 8, $userprofile);?>" id="challenge_id8" data-challenge-id="8" data-target="#problem_id_8" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_8">
+            Find The Easy<br> <span class="badge align-self-end"><?php echo getpoints($conn,150,8,'Medium'); ?></span>
+        </div>
+        <div id="problem_id_8" class="collapse card-body">
+            <blockquote class="card-blockquote">
+                <div style="display: flex;">
+                <h6 class="solvers challenge_<?php echo $challengeId8; ?>">Solvers: <span class="solver_num" id="solvers">
+                <?php
+                solvers($conn, 8, $flag,$teamName); 
+    ?>
+</span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId8; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 8); ?></span></h6>
+                </div>
+                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{p}<span id="dots">...</span><span id="more7" style="display: none;">In at \libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup7()" id="myBtn7" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup7" class="popup">
+    <span id="popupContent7"></span>
+    <button onclick="closePopup7()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup7() {
+        var moreText = document.getElementById("more7");
+        var popup = document.getElementById("popup7");
+        var popupContent = document.getElementById("popupContent7");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup7() {
+        var popup = document.getElementById("popup7");
+        popup.style.display = "none";
+    }
+</script>
+                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-8"></span>Download</a>
+                </p>
+                <form action="" method="POST" autocomplete="off">
+                <div class="input-group mt-3">
+                <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')" <?php echo (isset($_COOKIE['challenge8_solved']) || strpos(getchallengeColor($conn, 8, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="8">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge8_solved']) || strpos(getchallengeColor($conn,8, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                        </div>
+                    </div>
+                    <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 8) {
+                        $pointsToAdd = 150;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 10;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']);
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                </form>
+            </blockquote>
+        </div>
+    </div>
+</div>              
+                 <div class="col-md-4 mb-3">
+                    <div class="card category_misc">
+                        <div class="card-header <?php echo getchallengeColor($conn, 9, $userprofile);?>" id="challenge_id9" data-target="#problem_id_9" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_9">
+                            Impossible<br> <span class="badge align-self-end"><?php echo getpoints($conn,200,9,'Hard'); ?></span>
+                        </div>
+                        <div id="problem_id_9" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId9; ?>">Solvers: <span class="solver_num"><?php solvers($conn, 9, $flag,$teamName); ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId9; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 9); ?></span></h6>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{pass}<span id="dots">...</span><span id="more8" style="display: none;">In at //libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup8()" id="myBtn8" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup8" class="popup">
+    <span id="popupContent8"></span>
+    <button onclick="closePopup8()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup8() {
+        var moreText = document.getElementById("more8");
+        var popup = document.getElementById("popup8");
+        var popupContent = document.getElementById("popupContent8");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup8() {
+        var popup = document.getElementById("popup8");
+        popup.style.display = "none";
+    }
+</script>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-9"></span>Download</a>
+                                </p>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')" <?php echo (isset($_COOKIE['challenge9_solved']) || strpos(getchallengeColor($conn, 9, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                                <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="9">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge9_solved']) || strpos(getchallengeColor($conn, 9, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                                </div>
+                                </div>
+                                <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 9) {
+                        $pointsToAdd = 200;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -=15;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                    </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+        
+            
+            <div class="col-md-4 mb-3">
+                <div class="card category_web">
+        <div class="card-header <?php echo getchallengeColor($conn, 10, $userprofile);?>" id="challenge_id10" data-challenge-id="10" data-target="#problem_id_10" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_10">
+            Bombs CTF <br> <span class="badge align-self-end"><?php echo getpoints($conn, 100, 10, 'Easy'); ?></span>
+        </div>
+        <div id="problem_id_10" class="collapse card-body">
+            <blockquote class="card-blockquote">
+                <div style="display: flex;">
+                    <h6 class="solvers challenge_<?php echo $challengeId10; ?>">Solvers: <span class="solver_num"><?php solvers($conn, 10, $flag,$teamName); ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId10; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 10); ?></span></h6>
+                </div>
+                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{word}<span id="dots">...</span><span id="more9" style="display: none;">In at @libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup9()" id="myBtn9" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup9" class="popup">
+    <span id="popupContent9"></span>
+    <button onclick="closePopup9()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup9() {
+        var moreText = document.getElementById("more9");
+        var popup = document.getElementById("popup9");
+        var popupContent = document.getElementById("popupContent9");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup9() {
+        var popup = document.getElementById("popup9");
+        popup.style.display = "none";
+    }
+</script>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-10"></span>Download</a>
+                                </p>
+                <form action="" method="POST" autocomplete="off">
+                    <div class="input-group mt-3">
+                        <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')"  <?php echo (isset($_COOKIE['challenge10_solved']) || strpos(getchallengeColor($conn, 10, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="10">
+                            <input type="submit" class="btn btn-outline-secondary" value="Go!" name="login" id="submit"<?php echo (isset($_COOKIE['challenge10_solved']) || strpos(getchallengeColor($conn, 10, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        </div>
+                    </div>
+                    <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 10) {
+            $pointsToAdd = 100;
+            $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+            $resultCount = mysqli_query($conn, $queryCount);
+            if ($resultCount) {
+            $row = mysqli_fetch_assoc($resultCount);
+            $numTeamsSolved = $row['num_teams_solved'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    
+    handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+?>
+                </form>          
+                         </blockquote>
+                    </div>
+                </div>
+            </div>
+
+                <div class="col-md-4 mb-3">
+    <div class="card category_reversing">
+        <div class="card-header <?php echo getchallengeColor($conn, 11, $userprofile);?>" id="challenge_id11" data-challenge-id="11" data-target="#problem_id_11" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_11">
+            Find The Flag <br><span class="badge align-self-end"><?php echo getpoints($conn,150,11,'Medium'); ?></span>
+        </div>
+        <div id="problem_id_11" class="collapse card-body">
+            <blockquote class="card-blockquote">
+                <div style="display: flex;">
+                <h6 class="solvers challenge_<?php echo $challengeId11; ?>">Solvers: <span class="solver_num" id="solvers">
+                <?php
+                solvers($conn, 11, $flag,$teamName); 
+    ?>
+</span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId11; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 11); ?></span></h6>
+                </div>
+                <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI{password}
+                <span id="dots">...</span><span id="more10" style="display: none;">In at ()libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup10()" id="myBtn10" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup10" class="popup">
+    <span id="popupContent10"></span>
+    <button onclick="closePopup10()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup10() {
+        var moreText = document.getElementById("more10");
+        var popup = document.getElementById("popup10");
+        var popupContent = document.getElementById("popupContent10");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup10() {
+        var popup = document.getElementById("popup10");
+        popup.style.display = "none";
+    }
+</script>
+                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-11"></span>Download</a>
+                </p>
+                <form action="" method="POST" autocomplete="off">
+                <div class="input-group mt-3">
+                    <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon8" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')"  <?php echo (isset($_COOKIE['challenge11_solved']) || strpos(getchallengeColor($conn, 11, $teamName), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="11">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge11_solved']) || strpos(getchallengeColor($conn,11, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                        </div>
+                    </div>
+                    <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 11) {
+                        $pointsToAdd = 150;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 10;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']);
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                </form>
+            </blockquote>
+        </div>
+    </div>
+</div>              
+        <div class="col-md-4 mb-3">
+        <div class="card category_network">
+            <div class="card-header <?php echo getchallengeColor($conn, 12, $userprofile);?>" id="challenge_id12" data-target="#problem_id_12" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_12">
+                Impossible Challenge <span class="badge align-self-end"><?php echo getpoints($conn,200,12,'Hard'); ?></span>
+            </div>
+            <div id="problem_id_12" class="collapse card-body">
+        <blockquote class="card-blockquote">
+            <div style="display: flex;">
+            <h6 class="solvers challenge_<?php echo $challengeId12; ?>">Solvers: <span class="solver_num"><?php solvers($conn, 12, $flag,$teamName); ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId12; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 12); ?></span></h6>
+            </div>
+            <p> Can you find the password? Enter the password as flag in the following form: TALAKUNCHI_CTF{here}
+            <span id="dots">...</span><span id="more11" style="display: none;">In at -libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup11()" id="myBtn11" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup11" class="popup">
+    <span id="popupContent11"></span>
+    <button onclick="closePopup11()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup11() {
+        var moreText = document.getElementById("more11");
+        var popup = document.getElementById("popup11");
+        var popupContent = document.getElementById("popupContent11");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup11() {
+        var popup = document.getElementById("popup11");
+        popup.style.display = "none";
+    }
+</script>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-12"></span>Download</a>
+                                </p>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')"  <?php echo (isset($_COOKIE['challenge9_solved']) || strpos(getchallengeColor($conn, 12, $teamName), 'solved') !== false) ? 'disabled' : ''; ?>>
+                                <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="12">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge12_solved']) || strpos(getchallengeColor($conn, 12, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                        </div>
+                        </div>
+                            <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 12) {
+                        $pointsToAdd = 200;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -=15;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                    </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            <div class="col-md-4 mb-3">
+                <div class="card category_web">
+        <div class="card-header <?php echo getchallengeColor($conn, 13, $userprofile);?>" id="challenge_id13" data-challenge-id="13" data-target="#problem_id_13" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_13">
+            challenge 13<br> <span class="badge align-self-end"><?php echo getpoints($conn, 100, 13, 'Easy'); ?></span>
+        </div>
+        <div id="problem_id_13" class="collapse card-body">
+            <blockquote class="card-blockquote">
+                <div style="display: flex;">
+                    <h6 class="solvers challenge_<?php echo $challengeId13; ?>">Solvers: <span class="solver_num"><?php solvers($conn, 13, $flag,$teamName); ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId13; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 13); ?></span></h6>
+                </div>
+                <p> Can you find the password? Enter the password as flag in the following form: challenge13<span id="dots">...</span><span id="more12" style="display: none;">In at =libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup12()" id="myBtn12" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup12" class="popup">
+    <span id="popupContent12"></span>
+    <button onclick="closePopup12()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup12() {
+        var moreText = document.getElementById("more12");
+        var popup = document.getElementById("popup12");
+        var popupContent = document.getElementById("popupContent12");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup12() {
+        var popup = document.getElementById("popup12");
+        popup.style.display = "none";
+    }
+</script>
+                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-13"></span>Download</a>
+                </p>
+                <form action="" method="POST" autocomplete="off">
+                    <div class="input-group mt-3">
+                        <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')"  <?php echo (isset($_COOKIE['challenge13_solved']) || strpos(getchallengeColor($conn, 13, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="13">
+                            <input type="submit" class="btn btn-outline-secondary" value="Go!" name="login" id="submit"<?php echo (isset($_COOKIE['challenge13_solved']) || strpos(getchallengeColor($conn, 13, $userprofile), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        </div>
+                    </div>
+                    <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 13) {
+            $pointsToAdd = 100;
+            $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+            $resultCount = mysqli_query($conn, $queryCount);
+            if ($resultCount) {
+            $row = mysqli_fetch_assoc($resultCount);
+            $numTeamsSolved = $row['num_teams_solved'];
+
+        // Calculate the number of times to deduct points (every group of 5 teams)
+        $numDeductions = floor($numTeamsSolved / 5);
+
+        // Deduct points for each group of 5 teams
+        for ($i = 0; $i < $numDeductions; $i++) {
+            $pointsToAdd -= 5;
+        }
+    }
+    // Escape user inputs to prevent SQL injection
+    $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+    $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+    
+    handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+}
+?>
+                </form>          
+                         </blockquote>
+                    </div>
+                </div>
+            </div>
+                <div class="col-md-4 mb-3">
+    <div class="card category_reversing">
+        <div class="card-header <?php echo getchallengeColor($conn, 14, $userprofile);?>" id="challenge_id14" data-challenge-id="14" data-target="#problem_id_14" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')"  data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_14">
+            challenge 14<br> <span class="badge align-self-end"><?php echo getpoints($conn,150,14,'Medium'); ?></span>
+        </div>
+        <div id="problem_id_14" class="collapse card-body">
+            <blockquote class="card-blockquote">
+                <div style="display: flex;">
+                <h6 class="solvers challenge_<?php echo $challengeId14; ?>">Solvers: <span class="solver_num" id="solvers">
+                <?php
+                solvers($conn, 14, $flag,$teamName); 
+    ?>
+</span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId14; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 14); ?></span></h6>
+                </div>
+                <p> Can you find the password? Enter the password as flag in the following form: challenge14
+                <span id="dots">...</span><span id="more13" style="display: none;">In at +libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup13()" id="myBtn13" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup13" class="popup">
+    <span id="popupContent13"></span>
+    <button onclick="closePopup13()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup13() {
+        var moreText = document.getElementById("more13");
+        var popup = document.getElementById("popup13");
+        var popupContent = document.getElementById("popupContent13");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup13() {
+        var popup = document.getElementById("popup13");
+        popup.style.display = "none";
+    }
+</script>
+                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-14"></span>Download</a>
+                </p>
+                <form action="" method="POST" autocomplete="off">
+                <div class="input-group mt-3">
+                    <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon8" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')"  <?php echo (isset($_COOKIE['challenge14_solved']) || strpos(getchallengeColor($conn, 14, $teamName), 'solved') !== false) ? 'disabled' : ''; ?>>
+                        <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="14">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge14_solved']) || strpos(getchallengeColor($conn,14, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                        </div>
+                    </div>
+                    <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 14) {
+                        $pointsToAdd = 150;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -= 10;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']);
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                </form>
+            </blockquote>
+        </div>
+    </div>
+</div>              
+                 <div class="col-md-4 mb-3">
+                    <div class="card category_network">
+                        <div class="card-header <?php echo getchallengeColor($conn, 15, $userprofile);?>" id="challenge_id15" data-target="#problem_id_15" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_15">
+                            Challenge 15<br> <span class="badge align-self-end"><?php echo getpoints($conn,200,15,'Hard'); ?></span>
+                        </div>
+                        <div id="problem_id_15" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId15; ?>">Solvers: <span class="solver_num"><?php solvers($conn, 15, $flag,$teamName); ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId15; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 15); ?></span></h6>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: challenge15
+                                <span id="dots">...</span><span id="more14" style="display: none;">In at *libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup14()" id="myBtn14" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup14" class="popup">
+    <span id="popupContent14"></span>
+    <button onclick="closePopup14()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup14() {
+        var moreText = document.getElementById("more14");
+        var popup = document.getElementById("popup14");
+        var popupContent = document.getElementById("popupContent14");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup14() {
+        var popup = document.getElementById("popup14");
+        popup.style.display = "none";
+    }
+</script>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-15"></span>Download</a>
+                                </p>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')"  <?php echo (isset($_COOKIE['challenge9_solved']) || strpos(getchallengeColor($conn, 15, $teamName), 'solved') !== false) ? 'disabled' : ''; ?>>
+                                <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="15">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge15_solved']) || strpos(getchallengeColor($conn, 15, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                                </div>
+                                </div>
+                                <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 15) {
+                        $pointsToAdd = 200;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -=15;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                    </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card category_operating">
+                        <div class="card-header <?php echo getchallengeColor($conn, 16, $userprofile);?>" id="challenge_id16" data-target="#problem_id_16" data-toggle="collapse" aria-expanded="false" aria-controls="problem_id_16">
+                            Challenge 16<br> <span class="badge align-self-end"><?php echo getpoints($conn,100,16,'Easy'); ?></span>
+                        </div>
+                        <div id="problem_id_16" class="collapse card-body">
+                            <blockquote class="card-blockquote">
+                                <div style="display: flex;">
+                                <h6 class="solvers challenge_<?php echo $challengeId16; ?>">Solvers: <span class="solver_num"><?php solvers($conn, 16, $flag,$teamName); ?></span> &nbsp;<span class="color_blue challenge_<?php echo $challengeId16; ?>"><br>Difficulty:<?php echo getDifficulty($conn, 16); ?></span></h6>
+                                </div>
+                                <p> Can you find the password? Enter the password as flag in the following form: challenge16
+                                <span id="dots">...</span><span id="more16" style="display: none;">In at *libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor .</span>
+                <button onclick="openPopup16()" id="myBtn16" style="background-color: transparent; color: white; font-size:12px;border:none">Read more</button>
+                </p>
+<div id="popup16" class="popup">
+    <span id="popupContent16"></span>
+    <button onclick="closePopup16()" class="closeBtn" style="background-color: transparent; color: #72d0eb;">&times;</button>
+</div>
+                <script>
+    function openPopup16() {
+        var moreText = document.getElementById("more16");
+        var popup = document.getElementById("popup16");
+        var popupContent = document.getElementById("popupContent16");
+
+        popupContent.innerHTML = moreText.innerHTML;
+        popup.style.display = "block";
+    }
+    function closePopup16() {
+        var popup = document.getElementById("popup16");
+        popup.style.display = "none";
+    }
+</script>
+                                <a target="_blank" href="#!" class="btn btn-outline-secondary"><span class="fa fa-download mr-15"></span>Download</a>
+                                </p>
+                                <form action="" method="POST" autocomplete="off">
+                                <div class="input-group mt-3">
+                                <input type="text" id="flag" class="form-control" placeholder="Enter Flag" aria-label="Enter Flag" aria-describedby="basic-addon2" name="flag" oninput="this.value = this.value.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')"  <?php echo (isset($_COOKIE['challenge9_solved']) || strpos(getchallengeColor($conn, 16, $teamName), 'solved') !== false) ? 'disabled' : ''; ?>>
+                                <div class="input-group-append">
+                            <input type="hidden" name="challenge_id" value="16">
+                            <input type ="submit" class="btn btn-outline-secondary" value="Go!" type="button" name="login" id="submit"<?php echo (isset($_COOKIE['challenge15_solved']) || strpos(getchallengeColor($conn, 16, $teamName), 'solved') !== false) ? 'disabled' : '';?> ></button>
+                                </div>
+                                </div>
+                                <span style="color: white; margin-top: 6px;">Author: Bhavesh Chaudhary</span>
+                                <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['flag']) && isset($_POST['challenge_id']) && $_POST['challenge_id'] == 16) {
+                        $pointsToAdd = 100;
+                        $queryCount = "SELECT num_teams_solved FROM challenge_solvers WHERE challenge_id = $challengeId";
+                        $resultCount = mysqli_query($conn, $queryCount);
+                        if ($resultCount) {
+                            $row = mysqli_fetch_assoc($resultCount);
+                            $numTeamsSolved = $row['num_teams_solved'];
+                    
+                            // Calculate the number of times to deduct points (every group of 5 teams)
+                            $numDeductions = floor($numTeamsSolved / 5);
+                    
+                            // Deduct points for each group of 5 teams
+                            for ($i = 0; $i < $numDeductions; $i++) {
+                                $pointsToAdd -=5;
+                            }
+                        }
+                    
+                        // Escape user inputs to prevent SQL injection
+                        $teamName = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+                        $pointsToAdd = mysqli_real_escape_string($conn, $pointsToAdd);
+                        $flag = mysqli_real_escape_string($conn, $_POST['flag']); // Assuming the flag is submitted via POST
+                        
+                        handleFlagSubmission($conn, $teamName, $pointsToAdd, $flag, $challengeId); // Use the correct challenge ID for each challenge
+                    }                    
+                    ?>
+                    </form>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>                
+
